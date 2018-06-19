@@ -1,0 +1,53 @@
+# Borrowed from:
+# https://github.com/silven/go-example/blob/master/Makefile
+# https://vic.demuzere.be/articles/golang-makefile-crosscompile/
+
+BINARY = cosmos-scorecard
+VET_REPORT = vet.report
+TEST_REPORT = tests.xml
+GOARCH = amd64
+
+VERSION=v0.1.0
+COMMIT=$(shell git rev-parse HEAD)
+BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
+
+# Symlink into GOPATH
+GITHUB_USERNAME=jackzampolin
+BUILD_DIR=${GOPATH}/src/github.com/${GITHUB_USERNAME}/${BINARY}
+CURRENT_DIR=$(shell pwd)
+BUILD_DIR_LINK=$(shell readlink ${BUILD_DIR})
+ARTIFACT_DIR=build
+FLAG_PATH=github.com/${GITHUB_USERNAME}/${BINARY}/cmd
+DOCKER_TAG=${VERSION}
+DOCKER_IMAGE=quay.io/jackzampolin/cosmos-scorecard
+
+# Setup the -ldflags option for go build here, interpolate the variable values
+LDFLAGS = -ldflags "-X ${FLAG_PATH}.Version=${VERSION} -X ${FLAG_PATH}.Commit=${COMMIT} -X ${FLAG_PATH}.Branch=${BRANCH}"
+
+# Build the project
+all: dep clean linux darwin
+
+linux: dep clean
+	cd ${BUILD_DIR}; \
+	GOOS=linux GOARCH=${GOARCH} go build ${LDFLAGS} -o ${ARTIFACT_DIR}/${BINARY}-linux-${GOARCH} . ; \
+	cd - >/dev/null
+
+darwin:
+	cd ${BUILD_DIR}; \
+	GOOS=darwin GOARCH=${GOARCH} go build ${LDFLAGS} -o ${ARTIFACT_DIR}/${BINARY}-darwin-${GOARCH} . ; \
+	cd - >/dev/null
+
+dep:
+	dep ensure
+
+docker:
+	cd ${BUILD_DIR}; \
+	docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+	docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
+	docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+	docker push ${DOCKER_IMAGE}:latest
+
+clean:
+	-rm -f ${ARTIFACT_DIR}/${BINARY}-*
+
+.PHONY: dep linux darwin fmt clean
