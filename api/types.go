@@ -2,6 +2,40 @@ package api
 
 import "time"
 
+// ValidatorDetails represents a validator in the /stake/validators response from the lcd
+type ValidatorDetails struct {
+	Owner                 string               `json:"owner"`
+	PubKey                string               `json:"pub_key"`
+	Revoked               bool                 `json:"revoked"`
+	PoolShares            PoolShares           `json:"pool_shares"`
+	DelegatorShares       string               `json:"delegator_shares"`
+	Description           ValidatorDescription `json:"description"`
+	BondHeight            int                  `json:"bond_height"`
+	BondIntraTxCounter    int                  `json:"bond_intra_tx_counter"`
+	ProposerRewardPool    int                  `json:"proposer_reward_pool"`
+	Commission            string               `json:"commission"`
+	CommissionMax         string               `json:"commission_max"`
+	CommissionChangeRate  string               `json:"commission_change_rate"`
+	CommissionChangeToday string               `json:"commission_change_today"`
+	PrevBondedShares      string               `json:"prev_bonded_shares"`
+}
+
+// ValidatorDescription contains descriptors for each validator
+type ValidatorDescription struct {
+	Moniker  string `json:"moniker"`
+	Identity string `json:"identity"`
+	Website  string `json:"website"`
+	Details  string `json:"details"`
+}
+
+// PoolShares represents the number of shares
+type PoolShares struct {
+	Status int    `json:"status"`
+	Amount string `json:"amount"`
+}
+
+// FROM DUMP CONSENSUS STATE
+
 // RoundState represents the round state at time of query
 type RoundState struct {
 	Height             int         `json:"height"`
