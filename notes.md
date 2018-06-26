@@ -14,5 +14,4 @@ There are three potential routes here:
     * subscribes to new blocks
     * https://lcd.technofractal.com/validatorsets/459777
     * Or `/stake/validators` every block with notifications and persist the validators present at that block
-  - Use the one that `figment.network` has with a different skin. Talking to them about that Tuesday 26 Jun.
-  
+  - Talk with `figment.network` about using their's potentially with a different skin.
